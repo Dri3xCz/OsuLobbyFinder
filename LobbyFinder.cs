@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Net;
 
 namespace OsuMultiplayerLobbyFinder
 {
@@ -13,11 +14,11 @@ namespace OsuMultiplayerLobbyFinder
             var htmlDocument = new HtmlDocument();
             for (int i = 0; i < parameters.timeToLive; i++)
             {
-                int matchId = parameters.startLobbyId - i;
+                int lobbyId = parameters.startLobbyId - i;
                 try
                 {
                     var html = await httpClient.GetStringAsync(
-                        $"https://osu.ppy.sh/community/matches/{matchId}"
+                        $"https://osu.ppy.sh/community/matches/{lobbyId}"
                     );
                     htmlDocument.LoadHtml(html);
 
@@ -25,17 +26,14 @@ namespace OsuMultiplayerLobbyFinder
 
                     if (MatchPattern(lobbyName, parameters.namePattern))
                     {
-                        return matchId;
+                        return lobbyId;
                     }
-                } catch
+                } catch (Exception e)
                 {
-                    Console.WriteLine("Fetch failed! MatchId: " + matchId);
+                    handleFindLobbyExceptions(e, lobbyId, i);
                 }
-
-                // Just for safety, the delay between fetches should be enough, but if this gets blocked, increase the delay
-                Thread.Sleep(500);
+                Thread.Sleep(250);
             }
-
             return 0;
         }
 
@@ -47,6 +45,32 @@ namespace OsuMultiplayerLobbyFinder
         private bool MatchPattern(string tested, string matcher)
         {
             return tested.Contains(matcher);
+        }
+
+        private void handleFindLobbyExceptions(Exception e, int lobbyId, int iterator)
+        {
+            if (e.GetType() == typeof(HttpRequestException))
+            {
+                switch ((e as HttpRequestException).StatusCode)
+                {
+                    case HttpStatusCode.Unauthorized:
+                        Console.WriteLine($"Fetch failed - Unauthorized access, Lobby id: {lobbyId}");
+                        break;
+                    case HttpStatusCode.TooManyRequests:
+                        Console.WriteLine($"Fetch failed - Too many requests, waiting for 5 seconds");
+                        iterator--;
+                        Thread.Sleep(5000);
+                        Console.WriteLine("Resumed fetching");
+                        break;
+                    default:
+                        Console.WriteLine($"Fetch failed - {e.Message} Lobby id: {lobbyId}");
+                        break;
+                }
+
+                return;
+            }
+
+            Console.WriteLine($"Fetch failed! NotHttpRequestExcpetion, Error message: {e.Message} Lobby id: {lobbyId}");
         }
     }
 
