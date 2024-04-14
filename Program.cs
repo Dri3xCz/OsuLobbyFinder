@@ -4,22 +4,23 @@ class Program
 {
     public async static Task Main()
     {
-        var LobbyFinder = new LobbyFinder();
-        Console.Write("ID of first lobby: ");
-        int id = Convert.ToInt32(Console.ReadLine());
-        Console.Write("Time to live: ");
-        int ttl = Convert.ToInt32(Console.ReadLine());
-        Console.Write("Name of lobby: ");
-        string name = Console.ReadLine();
+        InputHandeler inputHandeler = new InputHandeler();
 
+        Console.Write("ID of first lobby: ");
+        int id = inputHandeler.ReadInt();
+        Console.Write("Time to live: ");
+        int ttl = inputHandeler.ReadInt();
+        Console.Write("Name of lobby: ");
+        string name = inputHandeler.ReadString();
+
+        var lobbyFinder = new LobbyFinder();
         FindLobbyParameters parameters = new FindLobbyParameters(
             id,
             ttl,
             name
         );
-
-        int result = await LobbyFinder.FindLobbyUntilFound(parameters);
+  
+        int result = await lobbyFinder.FindLobbyUntilFound(parameters);
         Console.WriteLine("Succesfull find!: " + result);
-        // 0 znamená že to nic nenašlo
     }
 }
