@@ -8,7 +8,21 @@ namespace OsuMultiplayerLobbyFinder
     {
         public LobbyFinder() { }
 
-        public async Task<int> FindLobby(FindLobbyParameters parameters)
+        public async Task<int> FindLobbyUntilFound(FindLobbyParameters parameters)
+        {
+            while (true)
+            {
+                int res = await _FindLobby(parameters);
+                if (res != 0)
+                    return res;
+
+                Console.WriteLine($"Lobby not found, continue searching for {parameters.timeToLive} more?");
+                Console.ReadLine();
+                parameters.startLobbyId -= parameters.timeToLive;
+            }    
+        }
+
+        private async Task<int> _FindLobby(FindLobbyParameters parameters)
         {
             var httpClient = new HttpClient();
             var htmlDocument = new HtmlDocument();
@@ -22,32 +36,32 @@ namespace OsuMultiplayerLobbyFinder
                     );
                     htmlDocument.LoadHtml(html);
 
-                    string lobbyName = GetLobbyName(htmlDocument);
+                    string lobbyName = _GetLobbyName(htmlDocument);
 
-                    if (MatchPattern(lobbyName, parameters.namePattern))
+                    if (_MatchPattern(lobbyName, parameters.namePattern))
                     {
                         return lobbyId;
                     }
                 } catch (Exception e)
                 {
-                    handleFindLobbyExceptions(e, lobbyId, i);
+                    _HandleFindLobbyExceptions(e, lobbyId, i);
                 }
                 Thread.Sleep(250);
             }
             return 0;
         }
 
-        private string GetLobbyName(HtmlDocument html)
+        private string _GetLobbyName(HtmlDocument html)
         {
             return html.DocumentNode.SelectNodes("//title").First().InnerHtml;
         }
 
-        private bool MatchPattern(string tested, string matcher)
+        private bool _MatchPattern(string tested, string matcher)
         {
             return tested.Contains(matcher);
         }
 
-        private void handleFindLobbyExceptions(Exception e, int lobbyId, int iterator)
+        private void _HandleFindLobbyExceptions(Exception e, int lobbyId, int iterator)
         {
             if (e.GetType() == typeof(HttpRequestException))
             {

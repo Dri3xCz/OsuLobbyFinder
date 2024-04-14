@@ -18,7 +18,7 @@ class Program
             name
         );
 
-        int result = await LobbyFinder.FindLobby(parameters);
+        int result = await LobbyFinder.FindLobbyUntilFound(parameters);
         Console.WriteLine("Succesfull find!: " + result);
         // 0 znamená že to nic nenašlo
     }
