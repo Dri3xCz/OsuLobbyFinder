@@ -3,7 +3,6 @@
 
 class Program
 {
-    [STAThread]
     public async static Task Main()
     {
         InputHandeler inputHandeler = new InputHandeler();
