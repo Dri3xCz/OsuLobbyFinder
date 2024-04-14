@@ -1,7 +1,9 @@
 ﻿namespace OsuMultiplayerLobbyFinder;
 
+
 class Program
 {
+    
     public async static Task Main()
     {
         InputHandeler inputHandeler = new InputHandeler();
@@ -22,5 +24,7 @@ class Program
   
         int result = await lobbyFinder.FindLobbyUntilFound(parameters);
         Console.WriteLine("Succesfull find!: " + result);
+        
+        Console.ReadLine();
     }
 }
