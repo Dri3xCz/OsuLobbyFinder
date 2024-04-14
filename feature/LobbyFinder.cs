@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using System;
 using System.Net;
 
 namespace OsuMultiplayerLobbyFinder
@@ -25,7 +24,7 @@ namespace OsuMultiplayerLobbyFinder
         private async Task<int> _FindLobby(FindLobbyParameters parameters)
         {
             var httpClient = new HttpClient();
-            var htmlDocument = new HtmlDocument();
+            var htmlDocument = new HtmlAgilityPack.HtmlDocument();
             for (int i = 0; i < parameters.timeToLive; i++)
             {
                 int lobbyId = parameters.startLobbyId - i;
@@ -51,7 +50,7 @@ namespace OsuMultiplayerLobbyFinder
             return 0;
         }
 
-        private string _GetLobbyName(HtmlDocument html)
+        private string _GetLobbyName(HtmlAgilityPack.HtmlDocument html)
         {
             return html.DocumentNode.SelectNodes("//title").First().InnerHtml;
         }

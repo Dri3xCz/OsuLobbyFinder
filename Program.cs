@@ -3,7 +3,7 @@
 
 class Program
 {
-    
+    [STAThread]
     public async static Task Main()
     {
         InputHandeler inputHandeler = new InputHandeler();
@@ -24,7 +24,8 @@ class Program
   
         int result = await lobbyFinder.FindLobbyUntilFound(parameters);
         Console.WriteLine("Succesfull find!: " + result);
-        
+        await STATask.Run(() => Clipboard.SetText(result.ToString()));
+
         Console.ReadLine();
     }
 }
