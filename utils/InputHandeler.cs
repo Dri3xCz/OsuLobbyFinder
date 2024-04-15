@@ -20,7 +20,8 @@
 
         public string ReadString()
         {
-            return Console.ReadLine() ?? "";
+            string text = Console.ReadLine() ?? "";
+            return text.Trim();
         }
     }
 }
