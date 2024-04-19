@@ -1,4 +1,5 @@
 ﻿using OsuMultiplayerLobbyFinder.models;
+using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,7 +10,7 @@ namespace OsuMultiplayerLobbyFinder.feature
     {
         public Task<bool> apiKeyIsValid(string apiKey);
 
-        public Task<LobbyModel> lobbyById(int id);
+        public Task<LobbyModel> lobbyById(int id, string apiKey);
     }
 
     public class OsuApi : Api
@@ -18,6 +19,7 @@ namespace OsuMultiplayerLobbyFinder.feature
 
         public async Task<bool> apiKeyIsValid(string apiKey)
         {
+            // random api endpoint
             var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user_recent");
             uriBuilder.Query = $"k={apiKey}";
             var query = uriBuilder.ToString();
@@ -30,9 +32,22 @@ namespace OsuMultiplayerLobbyFinder.feature
             return true;
         }
 
-        public async Task<LobbyModel> lobbyById(int id)
+        public async Task<LobbyModel> lobbyById(int id, string apiKey)
         {
-            throw new NotImplementedException();
+            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_match");
+            uriBuilder.Query = $"k={apiKey}&mp={id}";
+            var query = uriBuilder.ToString();
+
+            ResponseModel<LobbyModel> response = await _GetAsync<LobbyModel>(query);
+
+            if (response.Exception != null)
+            {
+                throw response.Exception;
+            }
+            else if (response.Response != null)
+                return response.Response;
+
+            throw new Exception("Incorrectly formed ResponseModel");
         }
 
         private async Task<ResponseModel<T>> _GetAsync<T>(string query)
