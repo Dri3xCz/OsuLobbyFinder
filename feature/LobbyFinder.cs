@@ -28,6 +28,8 @@ namespace OsuMultiplayerLobbyFinder
             for (int i = 0; i < parameters.timeToLive; i++)
             {
                 int lobbyId = parameters.startLobbyId - i;
+                Console.Title = $"Fetching: {lobbyId}";
+
                 try
                 {
                     var html = await httpClient.GetStringAsync(
