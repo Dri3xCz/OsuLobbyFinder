@@ -1,11 +1,18 @@
 ﻿using HtmlAgilityPack;
+using OsuMultiplayerLobbyFinder.feature;
+using OsuMultiplayerLobbyFinder.models;
 using System.Net;
 
 namespace OsuMultiplayerLobbyFinder
 {
     public class LobbyFinder
     {
-        public LobbyFinder() { }
+        private Api api;
+
+        public LobbyFinder(Api api) 
+        {
+            this.api = api;
+        }
 
         public async Task<int> FindLobbyUntilFound(FindLobbyParameters parameters)
         {
@@ -23,38 +30,25 @@ namespace OsuMultiplayerLobbyFinder
 
         private async Task<int> _FindLobby(FindLobbyParameters parameters)
         {
-            var httpClient = new HttpClient();
-            var htmlDocument = new HtmlAgilityPack.HtmlDocument();
             for (int i = 0; i < parameters.timeToLive; i++)
             {
                 int lobbyId = parameters.startLobbyId - i;
                 Console.Title = $"Fetching: {lobbyId}";
-
                 try
                 {
-                    var html = await httpClient.GetStringAsync(
-                        $"https://osu.ppy.sh/community/matches/{lobbyId}"
-                    );
-                    htmlDocument.LoadHtml(html);
-
-                    string lobbyName = _GetLobbyName(htmlDocument);
-
-                    if (_MatchPattern(lobbyName, parameters.namePattern))
-                    {
+                    LobbyModel response = await api.lobbyById(lobbyId);
+                    if (_MatchPattern(response.match.name, parameters.namePattern))
                         return lobbyId;
-                    }
-                } catch (Exception e)
+                } 
+                catch (Exception ex)
                 {
-                    _HandleFindLobbyExceptions(e, lobbyId, i);
+                    _HandleFindLobbyExceptions(ex, lobbyId);
                 }
-                Thread.Sleep(250);
+
+                // Extra safety
+                Thread.Sleep(750);
             }
             return 0;
-        }
-
-        private string _GetLobbyName(HtmlAgilityPack.HtmlDocument html)
-        {
-            return html.DocumentNode.SelectNodes("//title").First().InnerHtml;
         }
 
         private bool _MatchPattern(string tested, string matcher)
@@ -62,7 +56,7 @@ namespace OsuMultiplayerLobbyFinder
             return tested.Contains(matcher);
         }
 
-        private void _HandleFindLobbyExceptions(Exception e, int lobbyId, int iterator)
+        private void _HandleFindLobbyExceptions(Exception e, int lobbyId)
         {
             if (e.GetType() == typeof(HttpRequestException))
             {
@@ -71,20 +65,12 @@ namespace OsuMultiplayerLobbyFinder
                     case HttpStatusCode.Unauthorized:
                         Console.WriteLine($"Fetch failed - Unauthorized access, Lobby id: {lobbyId}");
                         break;
-                    case HttpStatusCode.TooManyRequests:
-                        Console.WriteLine($"Fetch failed - Too many requests, waiting for 5 seconds");
-                        iterator--;
-                        Thread.Sleep(5000);
-                        Console.WriteLine("Resumed fetching");
-                        break;
                     default:
                         Console.WriteLine($"Fetch failed - {e.Message} Lobby id: {lobbyId}");
                         break;
                 }
-
                 return;
             }
-
             Console.WriteLine($"Fetch failed! NotHttpRequestExcpetion, Error message: {e.Message} Lobby id: {lobbyId}");
         }
     }

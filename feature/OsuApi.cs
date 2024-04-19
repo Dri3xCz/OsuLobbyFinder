@@ -8,13 +8,17 @@ namespace OsuMultiplayerLobbyFinder.feature
 {
     public interface Api
     {
+        public string ApiKey { get; set; }
+
         public Task<bool> apiKeyIsValid(string apiKey);
 
-        public Task<LobbyModel> lobbyById(int id, string apiKey);
+        public Task<LobbyModel> lobbyById(int id);
     }
 
     public class OsuApi : Api
     {
+        public string ApiKey { get; set; } = "";
+
         HttpClient client = new HttpClient();
 
         public async Task<bool> apiKeyIsValid(string apiKey)
@@ -32,10 +36,10 @@ namespace OsuMultiplayerLobbyFinder.feature
             return true;
         }
 
-        public async Task<LobbyModel> lobbyById(int id, string apiKey)
+        public async Task<LobbyModel> lobbyById(int id)
         {
             var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_match");
-            uriBuilder.Query = $"k={apiKey}&mp={id}";
+            uriBuilder.Query = $"k={ApiKey}&mp={id}";
             var query = uriBuilder.ToString();
 
             ResponseModel<LobbyModel> response = await _GetAsync<LobbyModel>(query);

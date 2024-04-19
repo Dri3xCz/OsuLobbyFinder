@@ -16,6 +16,7 @@ class Program
         InputHandeler inputHandler = new InputHandeler();
         Api api = new OsuApi();
         string apiKey = await HandleAPIKeyConfig(inputHandler, api);
+        api.ApiKey = apiKey;
 
 
         Console.Write("ID of first lobby: ");
@@ -25,7 +26,7 @@ class Program
         Console.Write("Name of lobby: ");
         string name = inputHandler.ReadString();
 
-        var lobbyFinder = new LobbyFinder();
+        var lobbyFinder = new LobbyFinder(api);
         FindLobbyParameters parameters = new FindLobbyParameters(
             id,
             ttl,
@@ -98,6 +99,7 @@ class Program
             }
         }
 
+        Console.Clear();
         return key;
     }
 
