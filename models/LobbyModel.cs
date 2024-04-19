@@ -1,34 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OsuMultiplayerLobbyFinder.models
+﻿public class LobbyModel
 {
-    public class LobbyModel
-    {
-        public LobbyModel(Lobby lobby)
-        {
-            Lobby = lobby;
-        }
+    public MatchInfo match { get; set; }
+    public Game[] games { get; set; }
+}
 
-        public Lobby Lobby { get; set; }
-    }
+public class MatchInfo
+{
+    public string match_id { get; set; }
+    public string name { get; set; }
+    public string start_time { get; set; }
+    public string? end_time { get; set; }
+}
 
-    public class Lobby
-    {
-        public Lobby(int matchId, string name, DateTime startTime, DateTime endTime)
-        {
-            MatchId = matchId;
-            Name = name;
-            StartTime = startTime;
-            EndTime = endTime;
-        }
+public class Game
+{
+    public string game_id { get; set; }
+    public string start_time { get; set; }
+    public string end_time { get; set; }
+    public string beatmap_id { get; set; }
+    public string play_mode { get; set; }
+    public string match_type { get; set; }
+    public string scoring_type { get; set; }
+    public string team_type { get; set; }
+    public string mods { get; set; }
+    public Score[] scores { get; set; }
+}
 
-        public int MatchId { get; set; }
-        public string Name { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-    }
+public class Score
+{
+    public string slot { get; set; }
+    public string team { get; set; }
+    public string user_id { get; set; }
+    public string score { get; set; }
+    public string maxcombo { get; set; }
+    public string rank { get; set; }
+    public string count50 { get; set; }
+    public string count100 { get; set; }
+    public string count300 { get; set; }
+    public string countmiss { get; set; }
+    public string countgeki { get; set; }
+    public string countkatu { get; set; }
+    public string perfect { get; set; }
+    public string pass { get; set; }
+    public string enabled_mods { get; set; }
 }
