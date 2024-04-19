@@ -399,3 +399,6 @@ FodyWeavers.xsd
 
 # VS code
 .vscode/
+
+# Project
+config.json
