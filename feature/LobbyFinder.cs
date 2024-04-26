@@ -34,18 +34,20 @@ namespace OsuMultiplayerLobbyFinder
             {
                 int lobbyId = parameters.startLobbyId - i;
                 Console.Title = $"Fetching: {lobbyId}";
-                try
-                {
-                    LobbyModel response = await api.lobbyById(lobbyId);
-                    if (_MatchPattern(response.match.name, parameters.namePattern))
-                        return lobbyId;
-                } 
-                catch (Exception ex)
-                {
-                    _HandleFindLobbyExceptions(ex, lobbyId);
-                }
+                
+                Either<Exception, LobbyModel> response = await api.lobbyById(lobbyId);
 
-                // Extra safety
+                LobbyModel? lobby = null;
+                response.Fold(
+                    (ex) => { _HandleFindLobbyExceptions(ex, lobbyId); },
+                    (value) => { lobby = value; }
+                );
+
+                if (lobby == null) continue;
+
+                if (_MatchPattern(lobby.match.name, parameters.namePattern))
+                    return lobbyId;
+
                 Thread.Sleep(750);
             }
             return 0;
@@ -71,7 +73,7 @@ namespace OsuMultiplayerLobbyFinder
                 }
                 return;
             }
-            Console.WriteLine($"Fetch failed! NotHttpRequestExcpetion, Error message: {e.Message} Lobby id: {lobbyId}");
+            Console.WriteLine($"Fetch failed! Lobby id: {lobbyId}");
         }
     }
 
