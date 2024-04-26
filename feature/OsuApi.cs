@@ -12,7 +12,7 @@ namespace OsuMultiplayerLobbyFinder.feature
 
         public Task<bool> apiKeyIsValid(string apiKey);
 
-        public Task<LobbyModel> lobbyById(int id);
+        public Task<Either<Exception, LobbyModel>> lobbyById(int id);
     }
 
     public class OsuApi : Api
@@ -22,39 +22,32 @@ namespace OsuMultiplayerLobbyFinder.feature
         HttpClient client = new HttpClient();
 
         public async Task<bool> apiKeyIsValid(string apiKey)
-        {
-            // random api endpoint
+        { 
             var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user_recent");
             uriBuilder.Query = $"k={apiKey}";
             var query = uriBuilder.ToString();
 
-            ResponseModel<object> response = await _GetAsync<object>(query);
+            Either<Exception, object> response = await _GetAsync<object>(query);
 
-            if (response.Exception != null)
-                return false;
+            bool isValid = false;
+            response.Fold(
+                (_) => { },
+                (_) => { isValid = true; }
+            );
 
-            return true;
+            return isValid;
         }
 
-        public async Task<LobbyModel> lobbyById(int id)
+        public async Task<Either<Exception, LobbyModel>> lobbyById(int id)
         {
             var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_match");
             uriBuilder.Query = $"k={ApiKey}&mp={id}";
             var query = uriBuilder.ToString();
 
-            ResponseModel<LobbyModel> response = await _GetAsync<LobbyModel>(query);
-
-            if (response.Exception != null)
-            {
-                throw response.Exception;
-            }
-            else if (response.Response != null)
-                return response.Response;
-
-            throw new Exception("Incorrectly formed ResponseModel");
+            return await _GetAsync<LobbyModel>(query);
         }
 
-        private async Task<ResponseModel<T>> _GetAsync<T>(string query)
+        private async Task<Either<Exception, T>> _GetAsync<T>(string query)
         {
             try
             {
@@ -64,11 +57,11 @@ namespace OsuMultiplayerLobbyFinder.feature
                 if (value == null)
                     throw new JsonException();
                 
-                return new ResponseModel<T>(value);
+                return new Right<Exception, T>(value);
 
             } catch (Exception ex)
             {
-                return new ResponseModel<T>(ex);
+                return new Left<Exception, T>(ex);
             }
         }
     }
