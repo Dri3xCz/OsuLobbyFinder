@@ -1,8 +1,8 @@
 ﻿namespace OsuMultiplayerLobbyFinder
 {
-    public class InputHandeler
+    public class InputHandler
     {
-        public InputHandeler() { }
+        public InputHandler() { }
 
         public int ReadInt()
         {
