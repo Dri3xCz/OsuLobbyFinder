@@ -13,8 +13,8 @@ class Program
 
     public async static Task Main()
     {
-        InputHandeler inputHandler = new InputHandeler();
-        Api api = new OsuApi();
+        InputHandler inputHandler = new InputHandler();
+        IApi api = new OsuApi();
         string apiKey = await HandleAPIKeyConfig(inputHandler, api);
         api.ApiKey = apiKey;
 
@@ -52,7 +52,7 @@ class Program
         Console.ReadLine();
     }
 
-    static async Task<string> HandleAPIKeyConfig(InputHandeler inputHandler, Api api)
+    static async Task<string> HandleAPIKeyConfig(InputHandler inputHandler, IApi api)
     {
         if (!File.Exists(CONFIG_PATH))
         {
@@ -68,7 +68,7 @@ class Program
         }   
     }
 
-    static async Task<string> HandleNoConfig(InputHandeler inputHandler, Api api)
+    static async Task<string> HandleNoConfig(InputHandler inputHandler, IApi api)
     {
         Console.WriteLine("It seems you didn't set API key yet!");
         Console.WriteLine("Enter your api key or type GETAPI to open osu api page");
@@ -86,7 +86,7 @@ class Program
             }
             else
             {
-                if (await api.apiKeyIsValid(input))
+                if (await api.ApiKeyIsValid(input))
                 {
                     WriteKeyToConfig(input);
                     key = input;
@@ -105,8 +105,8 @@ class Program
 
     static void WriteKeyToConfig(string key)    
     {
-        FileStream fs = File.Create(CONFIG_PATH);
-        StreamWriter sw = new StreamWriter(fs);
+        var fs = File.Create(CONFIG_PATH);
+        var sw = new StreamWriter(fs);
         var jsonObject = new JsonObject
         {
             { "ApiKey", key }

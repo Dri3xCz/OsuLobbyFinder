@@ -1,24 +1,22 @@
-﻿using HtmlAgilityPack;
-using OsuMultiplayerLobbyFinder.feature;
-using OsuMultiplayerLobbyFinder.models;
+﻿using OsuMultiplayerLobbyFinder.feature;
 using System.Net;
 
 namespace OsuMultiplayerLobbyFinder
 {
     public class LobbyFinder
     {
-        private Api api;
+        private readonly IApi _api;
 
-        public LobbyFinder(Api api) 
+        public LobbyFinder(IApi api) 
         {
-            this.api = api;
+            this._api = api;
         }
 
         public async Task<int> FindLobbyUntilFound(FindLobbyParameters parameters)
         {
             while (true)
             {
-                int res = await _FindLobby(parameters);
+                int res = await FindLobby(parameters);
                 if (res != 0)
                     return res;
 
@@ -28,24 +26,24 @@ namespace OsuMultiplayerLobbyFinder
             }    
         }
 
-        private async Task<int> _FindLobby(FindLobbyParameters parameters)
+        private async Task<int> FindLobby(FindLobbyParameters parameters)
         {
             for (int i = 0; i < parameters.timeToLive; i++)
             {
                 int lobbyId = parameters.startLobbyId - i;
                 Console.Title = $"Fetching: {lobbyId}";
                 
-                Either<Exception, LobbyModel> response = await api.lobbyById(lobbyId);
+                Either<Exception, LobbyModel> response = await _api.LobbyById(lobbyId);
 
                 LobbyModel? lobby = null;
                 response.Fold(
-                    (ex) => { _HandleFindLobbyExceptions(ex, lobbyId); },
+                    (ex) => { HandleFindLobbyExceptions(ex, lobbyId); },
                     (value) => { lobby = value; }
                 );
 
                 if (lobby == null) continue;
 
-                if (_MatchPattern(lobby.match.name, parameters.namePattern))
+                if (MatchPattern(lobby.match.name, parameters.namePattern))
                     return lobbyId;
 
                 Thread.Sleep(750);
@@ -53,12 +51,12 @@ namespace OsuMultiplayerLobbyFinder
             return 0;
         }
 
-        private bool _MatchPattern(string tested, string matcher)
+        private bool MatchPattern(string tested, string matcher)
         {
             return tested.Contains(matcher);
         }
 
-        private void _HandleFindLobbyExceptions(Exception e, int lobbyId)
+        private void HandleFindLobbyExceptions(Exception e, int lobbyId)
         {
             if (e.GetType() == typeof(HttpRequestException))
             {
