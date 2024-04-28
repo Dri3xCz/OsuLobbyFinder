@@ -58,9 +58,9 @@ namespace OsuMultiplayerLobbyFinder
 
         private void HandleFindLobbyExceptions(Exception e, int lobbyId)
         {
-            if (e.GetType() == typeof(HttpRequestException))
+            if (e is HttpRequestException httpRequestException)
             {
-                switch ((e as HttpRequestException).StatusCode)
+                switch (httpRequestException.StatusCode)
                 {
                     case HttpStatusCode.Unauthorized:
                         Console.WriteLine($"Fetch failed - Unauthorized access, Lobby id: {lobbyId}");
