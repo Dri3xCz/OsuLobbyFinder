@@ -4,6 +4,7 @@ using OsuMultiplayerLobbyFinder.models;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Windows.Networking.Proximity;
 
 namespace OsuMultiplayerLobbyFinder;
 
@@ -35,6 +36,15 @@ class Program
   
         int result = await lobbyFinder.FindLobbyUntilFound(parameters);
         Console.WriteLine("Succesfull find!: " + result);
+
+        Console.WriteLine("\nPlayers:\n");
+
+        var lobbyOrException = await api.LobbyById(result);
+        lobbyOrException.Fold(
+            (ex) => { Console.WriteLine(ex); },
+            (lobby) => { HandleUsers(lobby, api); }
+        );
+
         await STATask.Run(() => Clipboard.SetText(result.ToString()));
 
         new ToastContentBuilder()
@@ -50,6 +60,17 @@ class Program
         OpenBrowser(url);
 
         Console.ReadLine();
+    }
+
+    static async void HandleUsers(LobbyModel lobby, IApi api)
+    { 
+        UserFinder userFinder = new UserFinder(api);
+        List<UserModel> users = await userFinder.GetUsersFromLobby(lobby);
+
+        foreach (UserModel user in users)
+        {
+            Console.WriteLine($"{user.username} {user.user_id}");
+        }
     }
 
     static async Task<string> HandleAPIKeyConfig(InputHandler inputHandler, IApi api)
