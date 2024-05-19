@@ -1,4 +1,5 @@
 ﻿using OsuMultiplayerLobbyFinder.models;
+using OsuMultiplayerLobbyFinder.utils;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -22,7 +23,7 @@ namespace OsuMultiplayerLobbyFinder.feature
 
             bool isValid = false;
             response.Fold(
-                (_) => { },
+                (ex) => { Console.WriteLine(ex); },
                 (_) => { isValid = true; }
             );
 
@@ -38,11 +39,24 @@ namespace OsuMultiplayerLobbyFinder.feature
             return await GetAsync<LobbyModel>(query);
         }
 
+        public async Task<Either<Exception, UserModel>> UserById(int id)
+        {
+            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user");
+            uriBuilder.Query = $"k={ApiKey}&u={id}";
+            var query = uriBuilder.ToString();
+
+            return await GetAsync<UserModel>(query);
+        }
+
         private async Task<Either<Exception, T>> GetAsync<T>(string query)
         {
             try
             {
                 string response = await _client.GetStringAsync(query);
+                if (response[0] == '[')
+                {
+                    response = response.Substring(1, response.Length - 2);
+                }
                 T? value = JsonSerializer.Deserialize<T>(response);
 
                 if (value == null)

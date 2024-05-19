@@ -4,6 +4,7 @@ using OsuMultiplayerLobbyFinder.models;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Windows.Networking.Proximity;
 
 namespace OsuMultiplayerLobbyFinder;
 
@@ -35,7 +36,14 @@ class Program
   
         int result = await lobbyFinder.FindLobbyUntilFound(parameters);
         Console.WriteLine("Succesfull find!: " + result);
-        await STATask.Run(() => Clipboard.SetText(result.ToString()));
+
+        Console.WriteLine("\nPlayers:\n");
+
+        var lobbyOrException = await api.LobbyById(result);
+        lobbyOrException.Fold(
+            (ex) => { Console.WriteLine(ex); },
+            (lobby) => { HandleUsers(lobby, api); }
+        );
 
         new ToastContentBuilder()
             .AddText("OsuLobbyFinder")
@@ -50,6 +58,32 @@ class Program
         OpenBrowser(url);
 
         Console.ReadLine();
+    }
+
+    static async void HandleUsers(LobbyModel lobby, IApi api)
+    { 
+        UserFinder userFinder = new UserFinder(api);
+        List<UserModel> users = await userFinder.GetUsersFromLobby(lobby);
+        List<string> ids = new List<string>();
+        List<string> usernames = new List<string>();
+
+        foreach (UserModel user in users)
+        {
+            Console.WriteLine($"{user.user_id} {user.username}");
+            ids.Add(user.user_id);
+            usernames.Add(user.username);
+        }
+
+        Console.WriteLine("\nDifferent format:\n");
+
+        foreach (string id in ids)
+        {
+            Console.WriteLine(id);
+        }
+        foreach (string username in usernames)
+        {
+            Console.WriteLine(username);
+        }
     }
 
     static async Task<string> HandleAPIKeyConfig(InputHandler inputHandler, IApi api)
