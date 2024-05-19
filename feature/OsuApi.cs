@@ -53,7 +53,7 @@ namespace OsuMultiplayerLobbyFinder.feature
             try
             {
                 string response = await _client.GetStringAsync(query);
-                if (response[0] == '[')
+                if (response[0] == '[' && response.Length > 2)
                 {
                     response = response.Substring(1, response.Length - 2);
                 }
