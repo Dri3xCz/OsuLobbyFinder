@@ -45,8 +45,6 @@ class Program
             (lobby) => { HandleUsers(lobby, api); }
         );
 
-        await STATask.Run(() => Clipboard.SetText(result.ToString()));
-
         new ToastContentBuilder()
             .AddText("OsuLobbyFinder")
             .AddText("Lobby found: " + result)
@@ -66,10 +64,25 @@ class Program
     { 
         UserFinder userFinder = new UserFinder(api);
         List<UserModel> users = await userFinder.GetUsersFromLobby(lobby);
+        List<string> ids = new List<string>();
+        List<string> usernames = new List<string>();
 
         foreach (UserModel user in users)
         {
-            Console.WriteLine($"{user.username} {user.user_id}");
+            Console.WriteLine($"{user.user_id} {user.username}");
+            ids.Add(user.user_id);
+            usernames.Add(user.username);
+        }
+
+        Console.WriteLine("\nDifferent format:\n");
+
+        foreach (string id in ids)
+        {
+            Console.WriteLine(id);
+        }
+        foreach (string username in usernames)
+        {
+            Console.WriteLine(username);
         }
     }
 

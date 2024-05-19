@@ -23,7 +23,7 @@ namespace OsuMultiplayerLobbyFinder.feature
 
             bool isValid = false;
             response.Fold(
-                (_) => { },
+                (ex) => { Console.WriteLine(ex); },
                 (_) => { isValid = true; }
             );
 
@@ -53,7 +53,6 @@ namespace OsuMultiplayerLobbyFinder.feature
             try
             {
                 string response = await _client.GetStringAsync(query);
-                // Bruh
                 if (response[0] == '[')
                 {
                     response = response.Substring(1, response.Length - 2);
