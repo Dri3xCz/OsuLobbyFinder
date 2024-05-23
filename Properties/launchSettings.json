@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "OsuMultiplayerLobbyFinder": {
+      "commandName": "Project"
+    },
+    "Tests": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\Dri3x\\Desktop\\Moje programovací journey yaaaay\\OsuLobbyFinder\\tests"
+    }
+  }
+}
