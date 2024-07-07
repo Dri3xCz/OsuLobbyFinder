@@ -12,7 +12,7 @@ OsuLobbyFinder is a console application for Windows designed to help you find mu
 ## Installation
 Clone the repository:
 ```bash
-git clone https://github.com/yourusername/OsuLobbyFinder.git
+git clone https://github.com/Dri3xCz/OsuLobbyFinder.git
 cd OsuLobbyFinder
 ```
 Build the project using your preferred C# IDE, such as Visual Studio.
