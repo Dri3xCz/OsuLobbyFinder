@@ -1,5 +1,5 @@
-# OsuLobbyFinder
-OsuLobbyFinder is a console application for Windows designed to help you find multiplayer osu! lobbies quickly and efficiently. By specifying a few parameters, you can locate lobbies that match your criteria.
+# Osu Lobby Finder
+Osu Lobby Finder is a console application for Windows designed to help you find multiplayer osu! lobbies quickly and efficiently. By specifying a few parameters, you can locate lobbies that match your criteria.
 
 ## Features
 - Search for multiplayer osu! lobbies by specifying a starting ID, a time-to-live (TTL) limit, and a lobby name or pattern.
