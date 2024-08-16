@@ -1,31 +1,31 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
-using OsuMultiplayerLobbyFinder.feature;
 using OsuMultiplayerLobbyFinder.models;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Windows.Networking.Proximity;
+using OsuMultiplayerLobbyFinder.feature.api;
+using OsuMultiplayerLobbyFinder.feature.finders;
 
 namespace OsuMultiplayerLobbyFinder;
 
 class Program
 {
-    const string CONFIG_PATH = "./config.json";
+    const string ConfigPath = "./config.json";
 
-    public async static Task Main()
+    public static async Task Main()
     {
-        InputHandler inputHandler = new InputHandler();
+        var inputHandler = new InputHandler();
         IApi api = new OsuApi();
-        string apiKey = await HandleAPIKeyConfig(inputHandler, api);
+        string apiKey = await HandleApiKeyConfig(inputHandler, api);
         api.ApiKey = apiKey;
 
 
         Console.Write("ID of first lobby: ");
-        int id = inputHandler.ReadInt();
+        var id = inputHandler.ReadInt();
         Console.Write("Time to live: ");
-        int ttl = inputHandler.ReadInt();
+        var ttl = inputHandler.ReadInt();
         Console.Write("Name of lobby: ");
-        string name = inputHandler.ReadString();
+        var name = inputHandler.ReadString();
 
         var lobbyFinder = new LobbyFinder(api);
         FindLobbyParameters parameters = new FindLobbyParameters(
@@ -35,13 +35,13 @@ class Program
         );
   
         int result = await lobbyFinder.FindLobbyUntilFound(parameters);
-        Console.WriteLine("Succesfull find!: " + result);
+        Console.WriteLine("Successful find!: " + result);
 
         Console.WriteLine("\nPlayers:\n");
 
         var lobbyOrException = await api.LobbyById(result);
         lobbyOrException.Fold(
-            (ex) => { Console.WriteLine(ex); },
+            Console.WriteLine,
             (lobby) => { HandleUsers(lobby, api); }
         );
 
@@ -86,14 +86,14 @@ class Program
         }
     }
 
-    static async Task<string> HandleAPIKeyConfig(InputHandler inputHandler, IApi api)
+    private static async Task<string> HandleApiKeyConfig(InputHandler inputHandler, IApi api)
     {
-        if (!File.Exists(CONFIG_PATH))
+        if (!File.Exists(ConfigPath))
         {
             return await HandleNoConfig(inputHandler, api);
         } else
         {
-            string json = File.ReadAllText(CONFIG_PATH);
+            string json = await File.ReadAllTextAsync(ConfigPath);
             string? key = JsonSerializer.Deserialize<ConfigModel>(json)?.ApiKey;
             if (key != null)
                 return key;
@@ -102,7 +102,7 @@ class Program
         }   
     }
 
-    static async Task<string> HandleNoConfig(InputHandler inputHandler, IApi api)
+    private static async Task<string> HandleNoConfig(InputHandler inputHandler, IApi api)
     {
         Console.WriteLine("It seems you didn't set API key yet!");
         Console.WriteLine("Enter your api key or type GETAPI to open osu api page");
@@ -137,9 +137,9 @@ class Program
         return key;
     }
 
-    static void WriteKeyToConfig(string key)    
+    private static void WriteKeyToConfig(string key)    
     {
-        var fs = File.Create(CONFIG_PATH);
+        var fs = File.Create(ConfigPath);
         var sw = new StreamWriter(fs);
         var jsonObject = new JsonObject
         {

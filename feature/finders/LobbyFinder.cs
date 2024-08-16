@@ -1,39 +1,35 @@
-﻿using OsuMultiplayerLobbyFinder.feature;
-using System.Net;
+﻿using System.Net;
+using OsuMultiplayerLobbyFinder.feature.api;
+using OsuMultiplayerLobbyFinder.utils;
 
-namespace OsuMultiplayerLobbyFinder
+namespace OsuMultiplayerLobbyFinder.feature.finders
 {
-    public class LobbyFinder
+    public class LobbyFinder : Finder
     {
-        private readonly IApi _api;
-
-        public LobbyFinder(IApi api) 
-        {
-            this._api = api;
-        }
-
+        public LobbyFinder(IApi api) : base(api) {}
+        
         public async Task<int> FindLobbyUntilFound(FindLobbyParameters parameters)
         {
             while (true)
             {
-                int res = await FindLobby(parameters);
-                if (res != 0)
-                    return res;
+                var resultId = await FindLobby(parameters);
+                if (resultId != 0)
+                    return resultId;
 
-                Console.WriteLine($"Lobby not found, continue searching for {parameters.timeToLive} more?");
+                Console.WriteLine($"Lobby not found, continue searching for {parameters.TimeToLive} more?");
                 Console.ReadLine();
-                parameters.startLobbyId -= parameters.timeToLive;
+                parameters.StartLobbyId -= parameters.TimeToLive;
             }    
         }
 
         private async Task<int> FindLobby(FindLobbyParameters parameters)
         {
-            for (int i = 0; i < parameters.timeToLive; i++)
+            for (int i = 0; i < parameters.TimeToLive; i++)
             {
-                int lobbyId = parameters.startLobbyId - i;
+                int lobbyId = parameters.StartLobbyId - i;
                 Console.Title = $"Fetching: {lobbyId}";
                 
-                Either<Exception, LobbyModel> response = await _api.LobbyById(lobbyId);
+                Either<Exception, LobbyModel> response = await Api.LobbyById(lobbyId);
 
                 LobbyModel? lobby = null;
                 response.Fold(
@@ -43,17 +39,12 @@ namespace OsuMultiplayerLobbyFinder
 
                 if (lobby == null) continue;
 
-                if (MatchPattern(lobby.match.name, parameters.namePattern))
+                if (lobby.match.name.Contains(parameters.NamePattern))
                     return lobbyId;
 
                 Thread.Sleep(750);
             }
             return 0;
-        }
-
-        private bool MatchPattern(string tested, string matcher)
-        {
-            return tested.Contains(matcher);
         }
 
         private void HandleFindLobbyExceptions(Exception e, int lobbyId)
@@ -77,15 +68,15 @@ namespace OsuMultiplayerLobbyFinder
 
     public struct FindLobbyParameters
     {
-        public int startLobbyId;
-        public int timeToLive;
-        public string namePattern;
+        public int StartLobbyId;
+        public readonly int TimeToLive;
+        public readonly string NamePattern;
 
         public FindLobbyParameters(int startLobbyId, int timeToLive, string namePattern)
         {
-            this.startLobbyId = startLobbyId;
-            this.timeToLive = timeToLive;
-            this.namePattern = namePattern;
+            this.StartLobbyId = startLobbyId;
+            this.TimeToLive = timeToLive;
+            this.NamePattern = namePattern;
         }
     }
 }

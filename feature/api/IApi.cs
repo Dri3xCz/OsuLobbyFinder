@@ -1,6 +1,7 @@
 ﻿using OsuMultiplayerLobbyFinder.models;
+using OsuMultiplayerLobbyFinder.utils;
 
-namespace OsuMultiplayerLobbyFinder.feature
+namespace OsuMultiplayerLobbyFinder.feature.api
 {
     public interface IApi
     {

@@ -1,30 +1,40 @@
-﻿using OsuMultiplayerLobbyFinder.models;
+﻿using System.Text.Json;
+using OsuMultiplayerLobbyFinder.models;
 using OsuMultiplayerLobbyFinder.utils;
-using System;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
-namespace OsuMultiplayerLobbyFinder.feature
+namespace OsuMultiplayerLobbyFinder.feature.api
 {
     public class OsuApi : IApi
     {
-        public string ApiKey { get; set; } = "";
+        private string? _apiKey;
 
-        private HttpClient _client = new HttpClient();
+        public string ApiKey
+        {
+            get
+            {
+                if (_apiKey == null)
+                    throw new NullReferenceException("ApiKey used before it was set");
+                return _apiKey;
+            }
+            set => _apiKey = value;
+        }
+
+        private readonly HttpClient _client = new();
 
         public async Task<bool> ApiKeyIsValid(string apiKey)
         { 
-            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user_recent");
-            uriBuilder.Query = $"k={apiKey}";
-            var query = uriBuilder.ToString();
+            var uri = new UriBuilder("https://osu.ppy.sh/api/get_user_recent")
+            {
+                Query = $"k={apiKey}"
+            };
+            var query = uri.ToString();
 
             Either<Exception, object> response = await GetAsync<object>(query);
 
-            bool isValid = false;
+            var isValid = false;
             response.Fold(
-                (ex) => { Console.WriteLine(ex); },
-                (_) => { isValid = true; }
+                Console.WriteLine,
+                _ => { isValid = true; }
             );
 
             return isValid;
@@ -32,8 +42,10 @@ namespace OsuMultiplayerLobbyFinder.feature
 
         public async Task<Either<Exception, LobbyModel>> LobbyById(int id)
         {
-            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_match");
-            uriBuilder.Query = $"k={ApiKey}&mp={id}";
+            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_match")
+            {
+                Query = $"k={ApiKey}&mp={id}"
+            };
             var query = uriBuilder.ToString();
 
             return await GetAsync<LobbyModel>(query);
@@ -41,8 +53,10 @@ namespace OsuMultiplayerLobbyFinder.feature
 
         public async Task<Either<Exception, UserModel>> UserById(int id)
         {
-            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user");
-            uriBuilder.Query = $"k={ApiKey}&u={id}";
+            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user")
+            {
+                Query = $"k={ApiKey}&u={id}"
+            };
             var query = uriBuilder.ToString();
 
             return await GetAsync<UserModel>(query);
@@ -52,7 +66,7 @@ namespace OsuMultiplayerLobbyFinder.feature
         {
             try
             {
-                string response = await _client.GetStringAsync(query);
+                var response = await _client.GetStringAsync(query);
                 if (response[0] == '[' && response.Length > 2)
                 {
                     response = response.Substring(1, response.Length - 2);

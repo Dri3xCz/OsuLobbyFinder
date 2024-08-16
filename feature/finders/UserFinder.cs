@@ -1,19 +1,16 @@
-﻿using OsuMultiplayerLobbyFinder.models;
+﻿using OsuMultiplayerLobbyFinder.feature.api;
+using OsuMultiplayerLobbyFinder.models;
+using OsuMultiplayerLobbyFinder.utils;
 
-namespace OsuMultiplayerLobbyFinder.feature
+namespace OsuMultiplayerLobbyFinder.feature.finders
 {
-    public class UserFinder
+    public class UserFinder : Finder
     {
-        private readonly IApi _api;
-
-        public UserFinder(IApi api)
-        {
-            this._api = api;
-        }
-
+        public UserFinder(IApi api) : base(api) {}
+        
         public async Task<List<UserModel>> GetUsersFromLobby(LobbyModel lobby)
         {
-            List<string> knownUserIds = new List<string>();
+            var knownUserIds = new List<string>();
 
             foreach (Game game in lobby.games)
             {
@@ -26,13 +23,14 @@ namespace OsuMultiplayerLobbyFinder.feature
                 }
             }
 
-            List<UserModel> userModels = new List<UserModel>();
+            var userModels = new List<UserModel>();
 
             foreach (string userId in knownUserIds)
             {
-                var ExceptionOrUser = await GetUserModelById(Convert.ToInt32(userId));
-                ExceptionOrUser.Fold(
-                    (_) => { },
+                var convertedUserId = Convert.ToInt32(userId);
+                
+                var exceptionOrUser = await GetUserModelById(convertedUserId);
+                exceptionOrUser.Map(
                     (user) => { userModels.Add(user); }
                 );
             }
@@ -42,7 +40,7 @@ namespace OsuMultiplayerLobbyFinder.feature
 
         private async Task<Either<Exception, UserModel>> GetUserModelById(int id)
         {
-            return await _api.UserById(id);
+            return await Api.UserById(id);
         }
     }
 }
