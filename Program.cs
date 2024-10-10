@@ -24,14 +24,22 @@ class Program
         var id = inputHandler.ReadInt();
         Console.Write("Time to live: ");
         var ttl = inputHandler.ReadInt();
-        Console.Write("Name of lobby: ");
-        var name = inputHandler.ReadString();
+        Console.Write("Name of lobby (Optional): ");
+        var name = inputHandler.ReadStringOrNull();
+        string? playerId = null;
+        if (name == null)
+        {
+            Console.Write("ID of player in lobby: ");
+            playerId = inputHandler.ReadString();
+        }
+       
 
         var lobbyFinder = new LobbyFinder(api);
         FindLobbyParameters parameters = new FindLobbyParameters(
             id,
             ttl,
-            name
+            name,
+            playerId
         );
   
         int result = await lobbyFinder.FindLobbyUntilFound(parameters);
