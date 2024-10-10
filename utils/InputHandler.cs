@@ -23,5 +23,12 @@
             string text = Console.ReadLine() ?? "";
             return text.Trim();
         }
+
+        public string? ReadStringOrNull()
+        {
+            string? text = Console.ReadLine() ?? "";
+
+            return text != "" ? text.Trim() : null;
+        }
     }
 }

@@ -1,12 +1,19 @@
 ﻿using System.Net;
 using OsuMultiplayerLobbyFinder.feature.api;
+using OsuMultiplayerLobbyFinder.feature.matcher;
 using OsuMultiplayerLobbyFinder.utils;
 
 namespace OsuMultiplayerLobbyFinder.feature.finders
 {
     public class LobbyFinder : Finder
     {
-        public LobbyFinder(IApi api) : base(api) {}
+        private ILobbyMatcher _lobbyMatcher;
+
+        public LobbyFinder(IApi api) : base(api) 
+        {
+            // FIXME: Make this as a dependency injection and add service locator
+            _lobbyMatcher = new LobbyMatcher();
+        }
         
         public async Task<int> FindLobbyUntilFound(FindLobbyParameters parameters)
         {
@@ -39,7 +46,7 @@ namespace OsuMultiplayerLobbyFinder.feature.finders
 
                 if (lobby == null) continue;
 
-                if (lobby.match.name.Contains(parameters.NamePattern))
+                if (_lobbyMatcher.MatchLobby(lobby, parameters.NamePattern, parameters.PlayerId))
                     return lobbyId;
 
                 Thread.Sleep(750);
@@ -70,13 +77,15 @@ namespace OsuMultiplayerLobbyFinder.feature.finders
     {
         public int StartLobbyId;
         public readonly int TimeToLive;
-        public readonly string NamePattern;
+        public readonly string? NamePattern;
+        public readonly string? PlayerId;
 
-        public FindLobbyParameters(int startLobbyId, int timeToLive, string namePattern)
+        public FindLobbyParameters(int startLobbyId, int timeToLive, string? namePattern, string? playerId)
         {
             this.StartLobbyId = startLobbyId;
             this.TimeToLive = timeToLive;
             this.NamePattern = namePattern;
+            this.PlayerId = playerId;
         }
     }
 }
