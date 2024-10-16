@@ -1,14 +1,15 @@
-﻿using OsuMultiplayerLobbyFinder.feature.api;
-using OsuMultiplayerLobbyFinder.models;
-using OsuMultiplayerLobbyFinder.utils;
+﻿using OsuMultiplayerLobbyFinder.Feature.Api;
+using OsuMultiplayerLobbyFinder.Models;
+using OsuMultiplayerLobbyFinder.Models.Lobby;
+using OsuMultiplayerLobbyFinder.Utils;
 
-namespace OsuMultiplayerLobbyFinder.feature.finders
+namespace OsuMultiplayerLobbyFinder.Feature.Finders
 {
     public class UserFinder : Finder
     {
         public UserFinder(IApi api) : base(api) {}
         
-        public async Task<List<UserModel>> GetUsersFromLobby(LobbyModel lobby)
+        public async Task<List<User>> GetUsersFromLobby(Lobby lobby)
         {
             var knownUserIds = new List<string>();
 
@@ -23,22 +24,22 @@ namespace OsuMultiplayerLobbyFinder.feature.finders
                 }
             }
 
-            var userModels = new List<UserModel>();
+            var userList = new List<User>();
 
             foreach (string userId in knownUserIds)
             {
                 var convertedUserId = Convert.ToInt32(userId);
                 
-                var exceptionOrUser = await GetUserModelById(convertedUserId);
+                var exceptionOrUser = await GetUserById(convertedUserId);
                 exceptionOrUser.Map(
-                    (user) => { userModels.Add(user); }
+                    (user) => { userList.Add(user); }
                 );
             }
 
-            return userModels;
+            return userList;
         }
 
-        private async Task<Either<Exception, UserModel>> GetUserModelById(int id)
+        private async Task<Either<Exception, User>> GetUserById(int id)
         {
             return await Api.UserById(id);
         }

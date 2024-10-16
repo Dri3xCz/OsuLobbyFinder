@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <ApplicationIcon>assets\mag_glass.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\mag_glass.ico</ApplicationIcon>
   </PropertyGroup>
 
   <!-- Windows-specific settings -->
@@ -16,7 +16,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <Content Include="assets\mag_glass.ico" />
+    <Content Include="Assets\mag_glass.ico" />
   </ItemGroup>
 
   <ItemGroup>

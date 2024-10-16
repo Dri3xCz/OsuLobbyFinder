@@ -1,4 +1,4 @@
-﻿namespace OsuMultiplayerLobbyFinder.utils
+﻿namespace OsuMultiplayerLobbyFinder.Utils
 {
     public class DateTimeConverter
     {

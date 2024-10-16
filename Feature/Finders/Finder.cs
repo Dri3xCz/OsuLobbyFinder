@@ -1,6 +1,6 @@
-using OsuMultiplayerLobbyFinder.feature.api;
+using OsuMultiplayerLobbyFinder.Feature.Api;
 
-namespace OsuMultiplayerLobbyFinder.feature.finders;
+namespace OsuMultiplayerLobbyFinder.Feature.Finders;
 
 public abstract class Finder
 {

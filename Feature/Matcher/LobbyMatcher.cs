@@ -1,8 +1,10 @@
-﻿namespace OsuMultiplayerLobbyFinder.feature.matcher
+﻿using OsuMultiplayerLobbyFinder.Models.Lobby;
+
+namespace OsuMultiplayerLobbyFinder.Feature.Matcher
 {
     public class LobbyMatcher : ILobbyMatcher
     {
-        public bool MatchLobby(LobbyModel lobby, string? lobbyName, string? playerId)
+        public bool MatchLobby(Lobby lobby, string? lobbyName, string? playerId)
         {
             if (lobbyName != null)
             {
@@ -17,12 +19,12 @@
             throw new Exception("LobbyMatcher: MatchLobby called without lobbyName and playerId");
         }
 
-        private bool MatchByLobbyName(LobbyModel lobby, string lobbyName) 
+        private bool MatchByLobbyName(Lobby lobby, string lobbyName) 
         {
             return lobby.match.name.Contains(lobbyName);
         }
 
-        private bool MatchByPlayerId(LobbyModel lobby, string playerId)
+        private bool MatchByPlayerId(Lobby lobby, string playerId)
         {
             var knownUserIds = new List<string>();
 

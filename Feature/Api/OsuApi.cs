@@ -1,8 +1,9 @@
 ﻿using System.Text.Json;
-using OsuMultiplayerLobbyFinder.models;
-using OsuMultiplayerLobbyFinder.utils;
+using OsuMultiplayerLobbyFinder.Models;
+using OsuMultiplayerLobbyFinder.Models.Lobby;
+using OsuMultiplayerLobbyFinder.Utils;
 
-namespace OsuMultiplayerLobbyFinder.feature.api
+namespace OsuMultiplayerLobbyFinder.Feature.Api
 {
     public class OsuApi : IApi
     {
@@ -40,7 +41,7 @@ namespace OsuMultiplayerLobbyFinder.feature.api
             return isValid;
         }
 
-        public async Task<Either<Exception, LobbyModel>> LobbyById(int id)
+        public async Task<Either<Exception, Lobby>> LobbyById(int id)
         {
             var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_match")
             {
@@ -48,10 +49,10 @@ namespace OsuMultiplayerLobbyFinder.feature.api
             };
             var query = uriBuilder.ToString();
 
-            return await GetAsync<LobbyModel>(query);
+            return await GetAsync<Lobby>(query);
         }
 
-        public async Task<Either<Exception, UserModel>> UserById(int id)
+        public async Task<Either<Exception, User>> UserById(int id)
         {
             var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user")
             {
@@ -59,7 +60,7 @@ namespace OsuMultiplayerLobbyFinder.feature.api
             };
             var query = uriBuilder.ToString();
 
-            return await GetAsync<UserModel>(query);
+            return await GetAsync<User>(query);
         }
 
         private async Task<Either<Exception, T>> GetAsync<T>(string query)

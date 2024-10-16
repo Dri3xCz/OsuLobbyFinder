@@ -1,9 +1,10 @@
 ﻿using System.Net;
-using OsuMultiplayerLobbyFinder.feature.api;
-using OsuMultiplayerLobbyFinder.feature.matcher;
-using OsuMultiplayerLobbyFinder.utils;
+using OsuMultiplayerLobbyFinder.Feature.Api;
+using OsuMultiplayerLobbyFinder.Feature.Matcher;
+using OsuMultiplayerLobbyFinder.Models.Lobby;
+using OsuMultiplayerLobbyFinder.Utils;
 
-namespace OsuMultiplayerLobbyFinder.feature.finders
+namespace OsuMultiplayerLobbyFinder.Feature.Finders
 {
     public class LobbyFinder : Finder
     {
@@ -36,9 +37,9 @@ namespace OsuMultiplayerLobbyFinder.feature.finders
                 int lobbyId = parameters.StartLobbyId - i;
                 Console.Title = $"Fetching: {lobbyId}";
                 
-                Either<Exception, LobbyModel> response = await Api.LobbyById(lobbyId);
+                Either<Exception, Lobby> response = await Api.LobbyById(lobbyId);
 
-                LobbyModel? lobby = null;
+                Lobby? lobby = null;
                 response.Fold(
                     (ex) => { HandleFindLobbyExceptions(ex, lobbyId); },
                     (value) => { lobby = value; }
