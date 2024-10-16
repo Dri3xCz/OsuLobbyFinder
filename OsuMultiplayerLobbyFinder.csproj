@@ -3,18 +3,20 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationIcon>assets\mag_glass.ico</ApplicationIcon>
     <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsWindows)'=='true'">
+  <!-- Windows-specific settings -->
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <!-- Target net8.0-windows10.0.17763.0 when compiling for Windows -->
     <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <!-- Optionally specify the RID for Windows builds -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <DefineConstants>WINDOWS</DefineConstants>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsWindows)'=='false'">
-    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   
   <ItemGroup>
