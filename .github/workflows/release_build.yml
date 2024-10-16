@@ -1,0 +1,73 @@
+name: Build and Release for Windows OS
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Set up .NET Core SDK
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x' 
+
+    # Restore dependencies
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # Build the application
+    - name: Build the application
+      run: dotnet build --configuration Release
+
+    - name: Build the application
+      run: dotnet publish --configuration Release --runtime win-x64 -o ./publish
+
+    - name: Prepare output structure
+      run: |
+        mkdir OsuLobbyFinder
+        mv ./publish/* ./OsuLobbyFinder/
+
+    - name: Zip the build
+      run: zip -r OsuLobbyFinder.zip ./OsuLobbyFinder
+      
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build
+        path: OsuLobbyFinder.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Install GitHub CLI (gh)
+      - name: Install GitHub CLI
+        run: sudo apt-get install -y gh
+
+      # Download the zipped build artifact
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+
+      # Create a GitHub release using gh CLI
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          gh release create $TAG_NAME OsuLobbyFinder.zip --title "$TAG_NAME" --generate-notes --latest
