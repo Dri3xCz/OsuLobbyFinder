@@ -52,7 +52,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
             return await GetAsync<Lobby>(query);
         }
 
-        public async Task<Either<Exception, User>> UserById(int id)
+        public async Task<Either<Exception, User>> UserById(string id)
         {
             var uriBuilder = new UriBuilder(OsuUrlConstants.GetUser)
             {
@@ -63,7 +63,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
             return await GetAsync<User>(query);
         }
 
-        private async Task<Either<Exception, T>> GetAsync<T>(string query)
+        private async Task<Either<Exception, T>> GetAsync<T>(string query) where T : class
         {
             try
             {
