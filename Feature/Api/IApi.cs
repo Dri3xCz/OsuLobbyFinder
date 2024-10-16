@@ -12,6 +12,6 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
 
         public Task<Either<Exception, Lobby>> LobbyById(int id);
 
-        public Task<Either<Exception, User>> UserById(int id);
+        public Task<Either<Exception, User>> UserById(string id);
     }
 }

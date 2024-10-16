@@ -8,6 +8,6 @@ public abstract class Finder
 
     protected Finder(IApi api)
     {
-        this.Api = api;
+        Api = api;
     }
 }

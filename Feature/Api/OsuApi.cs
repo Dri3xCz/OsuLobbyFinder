@@ -24,7 +24,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
 
         public async Task<bool> ApiKeyIsValid(string apiKey)
         { 
-            var uri = new UriBuilder("https://osu.ppy.sh/api/get_user_recent")
+            var uri = new UriBuilder(OsuUrlConstants.GetUserRecent)
             {
                 Query = $"k={apiKey}"
             };
@@ -43,7 +43,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
 
         public async Task<Either<Exception, Lobby>> LobbyById(int id)
         {
-            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_match")
+            var uriBuilder = new UriBuilder(OsuUrlConstants.GetMatch)
             {
                 Query = $"k={ApiKey}&mp={id}"
             };
@@ -52,9 +52,9 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
             return await GetAsync<Lobby>(query);
         }
 
-        public async Task<Either<Exception, User>> UserById(int id)
+        public async Task<Either<Exception, User>> UserById(string id)
         {
-            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user")
+            var uriBuilder = new UriBuilder(OsuUrlConstants.GetUser)
             {
                 Query = $"k={ApiKey}&u={id}"
             };
@@ -63,7 +63,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
             return await GetAsync<User>(query);
         }
 
-        private async Task<Either<Exception, T>> GetAsync<T>(string query)
+        private async Task<Either<Exception, T>> GetAsync<T>(string query) where T : class
         {
             try
             {

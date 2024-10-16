@@ -6,16 +6,11 @@ using OsuMultiplayerLobbyFinder.Utils;
 
 namespace OsuMultiplayerLobbyFinder.Feature.Finders
 {
-    public class LobbyFinder : Finder
+    // FIXME: Make this as a dependency injection and add service locator
+    public class LobbyFinder(IApi api) : Finder(api)
     {
-        private ILobbyMatcher _lobbyMatcher;
+        private readonly ILobbyMatcher _lobbyMatcher = new LobbyMatcher();
 
-        public LobbyFinder(IApi api) : base(api) 
-        {
-            // FIXME: Make this as a dependency injection and add service locator
-            _lobbyMatcher = new LobbyMatcher();
-        }
-        
         public async Task<int> FindLobbyUntilFound(FindLobbyParameters parameters)
         {
             while (true)
@@ -25,7 +20,14 @@ namespace OsuMultiplayerLobbyFinder.Feature.Finders
                     return resultId;
 
                 Console.WriteLine($"Lobby not found, continue searching for {parameters.TimeToLive} more?");
-                Console.ReadLine();
+                
+                string input = (Console.ReadLine() ?? "n").Trim().ToLower();
+                bool exit = input is "n" or "no";
+                if (exit)
+                {
+                    Environment.Exit(0);
+                }
+                
                 parameters.StartLobbyId -= parameters.TimeToLive;
             }    
         }
@@ -55,7 +57,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Finders
             return 0;
         }
 
-        private void HandleFindLobbyExceptions(Exception e, int lobbyId)
+        private static void HandleFindLobbyExceptions(Exception e, int lobbyId)
         {
             if (e is HttpRequestException httpRequestException)
             {
@@ -71,22 +73,6 @@ namespace OsuMultiplayerLobbyFinder.Feature.Finders
                 return;
             }
             Console.WriteLine($"Fetch failed! Lobby id: {lobbyId}");
-        }
-    }
-
-    public struct FindLobbyParameters
-    {
-        public int StartLobbyId;
-        public readonly int TimeToLive;
-        public readonly string? NamePattern;
-        public readonly string? PlayerId;
-
-        public FindLobbyParameters(int startLobbyId, int timeToLive, string? namePattern, string? playerId)
-        {
-            this.StartLobbyId = startLobbyId;
-            this.TimeToLive = timeToLive;
-            this.NamePattern = namePattern;
-            this.PlayerId = playerId;
         }
     }
 }

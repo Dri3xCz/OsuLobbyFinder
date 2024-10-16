@@ -3,45 +3,31 @@ using OsuMultiplayerLobbyFinder.Models;
 using OsuMultiplayerLobbyFinder.Models.Lobby;
 using OsuMultiplayerLobbyFinder.Utils;
 
-namespace OsuMultiplayerLobbyFinder.Feature.Finders
+namespace OsuMultiplayerLobbyFinder.Feature.Finders;
+
+public class UserFinder(IApi api) : Finder(api)
 {
-    public class UserFinder : Finder
+    public async Task<List<User>> GetUsersFromLobby(Lobby lobby)
     {
-        public UserFinder(IApi api) : base(api) {}
-        
-        public async Task<List<User>> GetUsersFromLobby(Lobby lobby)
+        var users = new Dictionary<string, User>();
+
+        foreach (var game in lobby.games)
         {
-            var knownUserIds = new List<string>();
-
-            foreach (Game game in lobby.games)
+            foreach (string userId in game.scores.Select(score => score.user_id))
             {
-                foreach (Score score in game.scores)
+                if (users.ContainsKey(userId))
                 {
-                    if (!knownUserIds.Contains(score.user_id)) 
-                    {
-                        knownUserIds.Add(score.user_id);
-                    }
+                    continue;
                 }
-            }
 
-            var userList = new List<User>();
-
-            foreach (string userId in knownUserIds)
-            {
-                var convertedUserId = Convert.ToInt32(userId);
-                
-                var exceptionOrUser = await GetUserById(convertedUserId);
-                exceptionOrUser.Map(
-                    (user) => { userList.Add(user); }
+                var exceptionOrUser = await Api.UserById(userId);
+                exceptionOrUser.Fold(
+                    (ex) => { Console.WriteLine($"Unable to get user {userId}: {ex.Message}"); },
+                    (user) => { users.Add(userId, user); }
                 );
             }
-
-            return userList;
         }
 
-        private async Task<Either<Exception, User>> GetUserById(int id)
-        {
-            return await Api.UserById(id);
-        }
+        return users.Values.ToList();
     }
 }
