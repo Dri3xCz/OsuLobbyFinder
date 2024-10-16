@@ -1,4 +1,4 @@
-name: Build and Release
+name: Build and Release for Windows OS
 
 on:
   push:
@@ -28,15 +28,22 @@ jobs:
     - name: Build the application
       run: dotnet build --configuration Release
 
-    - name: Zip the build
-      run: zip -r build.zip ./bin/Release
+    - name: Build the application
+      run: dotnet publish --configuration Release --runtime win-x64 --self-contained -o ./publish
 
-    # Upload the zipped build as an artifact
+    - name: Prepare output structure
+      run: |
+        mkdir OsuLobbyFinder
+        mv ./publish/* ./OsuLobbyFinder/
+
+    - name: Zip the build
+      run: zip -r OsuLobbyFinder.zip ./OsuLobbyFinder
+      
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: build
-        path: ./build.zip
+        path: OsuLobbyFinder.zip
 
   release:
     needs: build
@@ -63,4 +70,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
-          gh release create $TAG_NAME build.zip --title "$TAG_NAME" --generate-notes --latest
+          gh release create $TAG_NAME OsuLobbyFinder.zip --title "$TAG_NAME" --generate-notes --latest
