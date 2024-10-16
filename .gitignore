@@ -402,3 +402,6 @@ FodyWeavers.xsd
 
 # Project
 config.json
+
+# IDEA IDEs
+.idea
