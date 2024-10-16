@@ -1,12 +1,14 @@
 ﻿#if WINDOWS
         using Microsoft.Toolkit.Uwp.Notifications;
 #endif
-using OsuMultiplayerLobbyFinder.models;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using OsuMultiplayerLobbyFinder.feature.api;
-using OsuMultiplayerLobbyFinder.feature.finders;
+using OsuMultiplayerLobbyFinder.Feature.Api;
+using OsuMultiplayerLobbyFinder.Feature.Finders;
+using OsuMultiplayerLobbyFinder.Models;
+using OsuMultiplayerLobbyFinder.Models.Lobby;
+using OsuMultiplayerLobbyFinder.Utils;
 
 namespace OsuMultiplayerLobbyFinder;
 
@@ -73,14 +75,14 @@ internal static class Program
         Console.ReadLine();
     }
 
-    static async Task HandleUsers(LobbyModel lobby, IApi api)
+    static async Task HandleUsers(Lobby lobby, IApi api)
     { 
         UserFinder userFinder = new UserFinder(api);
-        List<UserModel> users = await userFinder.GetUsersFromLobby(lobby);
+        List<User> users = await userFinder.GetUsersFromLobby(lobby);
         List<string> ids = new List<string>();
         List<string> usernames = new List<string>();
 
-        foreach (UserModel user in users)
+        foreach (User user in users)
         {
             Console.WriteLine($"{user.user_id} {user.username}");
             ids.Add(user.user_id);
@@ -107,7 +109,7 @@ internal static class Program
         }
         
         string json = await File.ReadAllTextAsync(ConfigPath);
-        string? key = JsonSerializer.Deserialize<ConfigModel>(json)?.ApiKey;
+        string? key = JsonSerializer.Deserialize<Config>(json)?.ApiKey;
         if (key != null)
             return key;
 
@@ -164,10 +166,6 @@ internal static class Program
 
     static void OpenBrowser(string url)
     {
-#if WINDOWS
-        Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
-#else
         Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-#endif
     }
 }

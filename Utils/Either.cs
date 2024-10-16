@@ -1,4 +1,4 @@
-﻿namespace OsuMultiplayerLobbyFinder.utils
+﻿namespace OsuMultiplayerLobbyFinder.Utils
 {
     public abstract class Either<TLeft, TRight>
     {

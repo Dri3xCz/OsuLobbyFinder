@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace OsuMultiplayerLobbyFinder.utils
+namespace OsuMultiplayerLobbyFinder.Utils
 {
     public class JsonSerializerUtil
     {

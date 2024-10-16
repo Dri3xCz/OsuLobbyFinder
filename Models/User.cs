@@ -1,6 +1,6 @@
-﻿namespace OsuMultiplayerLobbyFinder.models;
+namespace OsuMultiplayerLobbyFinder.Models;
 
-public class UserModel
+public class User
 {
     public string user_id { get; set; }
     public string username { get; set; }
@@ -24,13 +24,4 @@ public class UserModel
     public string total_seconds_played { get; set; }
     public string pp_country_rank { get; set; }
     public Event[] events { get; set; }
-}
-
-public class Event
-{
-    public string display_html { get; set; }
-    public string beatmap_id { get; set; }
-    public string beatmapset_id { get; set; }
-    public string date { get; set; }
-    public string epicfactor { get; set; }
 }

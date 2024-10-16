@@ -1,4 +1,4 @@
-﻿namespace OsuMultiplayerLobbyFinder
+﻿namespace OsuMultiplayerLobbyFinder.Utils
 {
     public class InputHandler
     {
