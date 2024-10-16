@@ -18,7 +18,7 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '7.0.x' # Use the version you need
+        dotnet-version: '8.0.x' 
 
     # Restore dependencies
     - name: Restore dependencies
@@ -28,13 +28,8 @@ jobs:
     - name: Build the application
       run: dotnet build --configuration Release
 
-    # Publish the application (for a web app or console app, adjust accordingly)
-    - name: Publish the application
-      run: dotnet publish -c Release -o ./publish
-
-    # Compress the published output
     - name: Zip the build
-      run: zip -r ./build.zip ./publish
+      run: zip -r build.zip ./bin/Release
 
     # Upload the zipped build as an artifact
     - name: Upload artifact
@@ -67,8 +62,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Extract the tag name from the GitHub reference
           TAG_NAME=${GITHUB_REF#refs/tags/}
-          
-          # Create the release
-          gh release create $TAG_NAME build.zip --title "Release $TAG_NAME" --notes "Build from tag $TAG_NAME" --latest
+          gh release create $TAG_NAME build.zip --title "$TAG_NAME" --generate-notes --latest
