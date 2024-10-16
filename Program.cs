@@ -164,6 +164,10 @@ internal static class Program
 
     static void OpenBrowser(string url)
     {
+#if WINDOWS
+        Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
+#else
         Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+#endif
     }
 }
