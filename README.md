@@ -6,6 +6,7 @@ Osu Lobby Finder is a console application designed to help you find multiplayer 
 - Utilizes the osu! Legacy API to retrieve lobby information.
   
 ## Requirements
+- .NET 8.0.x
 - An osu! Legacy API key. You can obtain this from the osu! website here: https://osu.ppy.sh/home/account/edit#legacy-api.
 
 ## Installation
