@@ -1,12 +1,11 @@
 # Osu Lobby Finder
-Osu Lobby Finder is a console application for Windows designed to help you find multiplayer osu! lobbies quickly and efficiently. By specifying a few parameters, you can locate lobbies that match your criteria.
+Osu Lobby Finder is a console application designed to help you find multiplayer osu! lobbies quickly and efficiently. By specifying a few parameters, you can locate lobbies that match your criteria.
 
 ## Features
 - Search for multiplayer osu! lobbies by specifying a starting ID, a time-to-live (TTL) limit, and a lobby name or pattern.
 - Utilizes the osu! Legacy API to retrieve lobby information.
   
 ## Requirements
-- Windows OS
 - An osu! Legacy API key. You can obtain this from the osu! website here: https://osu.ppy.sh/home/account/edit#legacy-api.
 
 ## Installation
