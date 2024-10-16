@@ -1,4 +1,6 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
+﻿#if WINDOWS
+        using Microsoft.Toolkit.Uwp.Notifications;
+#endif
 using OsuMultiplayerLobbyFinder.models;
 using System.Diagnostics;
 using System.Text.Json;
@@ -8,14 +10,15 @@ using OsuMultiplayerLobbyFinder.feature.finders;
 
 namespace OsuMultiplayerLobbyFinder;
 
-class Program
+internal static class Program
 {
-    const string ConfigPath = "./config.json";
-
+    private const string ConfigPath = "./config.json";
+    private const string OsuApiAddress = "https://osu.ppy.sh/p/api";
+    
     public static async Task Main()
     {
         var inputHandler = new InputHandler();
-        IApi api = new OsuApi();
+        var api = new OsuApi();
         string apiKey = await HandleApiKeyConfig(inputHandler, api);
         api.ApiKey = apiKey;
 
@@ -35,7 +38,7 @@ class Program
        
 
         var lobbyFinder = new LobbyFinder(api);
-        FindLobbyParameters parameters = new FindLobbyParameters(
+        var parameters = new FindLobbyParameters(
             id,
             ttl,
             name,
@@ -50,9 +53,10 @@ class Program
         var lobbyOrException = await api.LobbyById(result);
         lobbyOrException.Fold(
             Console.WriteLine,
-            (lobby) => { HandleUsers(lobby, api); }
+            (lobby) => { _ = HandleUsers(lobby, api); }
         );
 
+#if WINDOWS
         new ToastContentBuilder()
             .AddText("OsuLobbyFinder")
             .AddText("Lobby found: " + result)
@@ -60,6 +64,7 @@ class Program
             {
                 toast.ExpirationTime = DateTime.Now.AddSeconds(5);
             });
+#endif
 
         // Platform dependent as fuck
         string url = $"https://osu.ppy.sh/community/matches/{result}";
@@ -68,7 +73,7 @@ class Program
         Console.ReadLine();
     }
 
-    static async void HandleUsers(LobbyModel lobby, IApi api)
+    static async Task HandleUsers(LobbyModel lobby, IApi api)
     { 
         UserFinder userFinder = new UserFinder(api);
         List<UserModel> users = await userFinder.GetUsersFromLobby(lobby);
@@ -99,15 +104,14 @@ class Program
         if (!File.Exists(ConfigPath))
         {
             return await HandleNoConfig(inputHandler, api);
-        } else
-        {
-            string json = await File.ReadAllTextAsync(ConfigPath);
-            string? key = JsonSerializer.Deserialize<ConfigModel>(json)?.ApiKey;
-            if (key != null)
-                return key;
+        }
+        
+        string json = await File.ReadAllTextAsync(ConfigPath);
+        string? key = JsonSerializer.Deserialize<ConfigModel>(json)?.ApiKey;
+        if (key != null)
+            return key;
 
-            throw new Exception("API key in config file is not working");
-        }   
+        throw new Exception("API key in config file is not working");
     }
 
     private static async Task<string> HandleNoConfig(InputHandler inputHandler, IApi api)
@@ -123,8 +127,7 @@ class Program
 
             if (input == "GETAPI")
             {
-                string url = "https://osu.ppy.sh/p/api";
-                OpenBrowser(url);
+                OpenBrowser(OsuApiAddress);
             }
             else
             {
@@ -161,6 +164,6 @@ class Program
 
     static void OpenBrowser(string url)
     {
-        Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     }
 }
