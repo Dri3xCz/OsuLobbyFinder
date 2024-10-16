@@ -15,7 +15,7 @@ namespace OsuMultiplayerLobbyFinder;
 internal static class Program
 {
     private const string ConfigPath = "./config.json";
-    private const string OsuApiAddress = "https://osu.ppy.sh/p/api";
+    private const string OsuUserApiUrl = "https://osu.ppy.sh/p/api";
     
     public static async Task Main()
     {
@@ -129,7 +129,7 @@ internal static class Program
 
             if (input == "GETAPI")
             {
-                OpenBrowser(OsuApiAddress);
+                OpenBrowser(OsuUserApiUrl);
             }
             else
             {

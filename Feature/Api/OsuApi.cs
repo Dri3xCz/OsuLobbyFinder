@@ -24,7 +24,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
 
         public async Task<bool> ApiKeyIsValid(string apiKey)
         { 
-            var uri = new UriBuilder("https://osu.ppy.sh/api/get_user_recent")
+            var uri = new UriBuilder(OsuUrlConstants.GetUserRecentUrl)
             {
                 Query = $"k={apiKey}"
             };
@@ -43,7 +43,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
 
         public async Task<Either<Exception, Lobby>> LobbyById(int id)
         {
-            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_match")
+            var uriBuilder = new UriBuilder(OsuUrlConstants.GetMatchUrl)
             {
                 Query = $"k={ApiKey}&mp={id}"
             };
@@ -54,7 +54,7 @@ namespace OsuMultiplayerLobbyFinder.Feature.Api
 
         public async Task<Either<Exception, User>> UserById(int id)
         {
-            var uriBuilder = new UriBuilder("https://osu.ppy.sh/api/get_user")
+            var uriBuilder = new UriBuilder(OsuUrlConstants.GetUserUrl)
             {
                 Query = $"k={ApiKey}&u={id}"
             };
